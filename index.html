@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Upload e Visualização de Imagens</title>
+</head>
+
+<body>
+    <h1>Upload de Imagem</h1>
+    <form id="upload-form">
+        <input type="file" name="imagem" required />
+        <button type="submit">Enviar</button>
+    </form>
+
+    <h2>Imagens Armazenadas:</h2>
+    <div id="galeria"></div>
+
+    <script>
+        const apiURL = 'http://localhost:3000/';
+
+        async function carregarImagens() {
+            const res = await fetch(apiURL);
+            const imagens = await res.json();
+            const galeria = document.getElementById('galeria');
+            galeria.innerHTML = '';
+
+            imagens.forEach(img => {
+                const imagemEl = document.createElement('img');
+                imagemEl.src = `${apiURL}${img.id}`; // Remove a barra extra aqui
+                imagemEl.alt = img.nome;
+                imagemEl.style = 'max-width: 200px; margin: 10px;';
+                galeria.appendChild(imagemEl);
+            });
+        }
+
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            await fetch(apiURL, {
+                method: 'POST',
+                body: formData
+            });
+            e.target.reset();
+            carregarImagens();
+        });
+
+        carregarImagens();
+    </script>
+</body>
+
+</html>
